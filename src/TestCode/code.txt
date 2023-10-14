@@ -1,0 +1,161 @@
+//////////LIBRARIES//////////
+/////////////////////////////
+//////////VARIABLES//////////
+#define g 9.81
+#define pi 3.14159265
+#define row 998
+#define yb 0.17
+#define z0 0.6
+
+double y0; // height of nozzle
+//double y; //height of water at any instant of time
+//double yb = 0.17; //Point to hit on bottle
+double x[4]; //Distance as a function of time
+double z; //height of water at any instant of time
+//double z0 = 0.60; //initial height of water
+//double m; // mass of water at any instant t
+double tnoz; //time opened of nozzle
+double twater; //time taken to hit target
+double Aj = 7.0685*pow(10,-6); // Area of the nozzle
+double Ab = 1.96349*pow(10,-3); //Area of the base
+double m0 = row * Ab * z0; //initial mass of water
+//double v; //veloctiy per run
+double theta[4];
+
+int i;
+const int relayH; //initialize
+//double valveDelay = tnoz;//delete if unnecessary
+
+
+//delete if not using A9488
+//const int nozstepPin; // initialize
+//const int nozdirPin; // initialize
+//int nozAngle;
+//bool nozDir;
+
+const int stepPin; // initialize
+const int dirPin; // initialize
+double baseHeight;
+bool dir;
+/////////////////////////////
+//////////FUNCTIONS//////////
+//function to input distance x in cm and convert to m
+void inputX(double d1, double d2, double d3, double d4){
+  x[0]=d1/100;
+  x[1]=d2/100;
+  x[2]=d3/100;
+  x[3]=d4/100;
+}
+
+//function to input angle in degree
+void inputAngle(double a1, double a2, double a3, double a4){
+  theta[0]=a1;
+  theta[1]=a2;
+  theta[2]=a3;
+  theta[3]=a4;
+}
+
+void openValve(){
+  digitalWrite(relayH, HIGH);
+}
+void closeValve(){
+  digitalWrite(relayH, LOW);
+}  
+
+//Function to run the stepper --> check it
+//void rotateNoz(int steps,int stepperSpeed, bool dir){
+//  digitalWrite(nozdirPin, dir);
+//  stepperSpeed = (1.00000/(2* stepperSpeed * steps))*1000;
+//  for (int x=0;x<steps;x++){
+//    digitalWrite(nozstepPin,HIGH);
+//    delay(stepperSpeed);
+//    digitalWrite(nozstepPin,LOW);
+//    delay(stepperSpeed);
+//    }
+//  }
+  //3/20 * speed
+void liftBase(int steps, int stepperSpeed, bool dir){
+  digitalWrite(dirPin, dir);
+ stepperSpeed = 150.000000/stepperSpeed; //delay in ms
+ steps = steps * 200;
+  for (int x=0;x<steps;x++){   
+    digitalWrite(stepPin,HIGH);
+    delay(stepperSpeed);
+    digitalWrite(stepPin,LOW);
+    delay(stepperSpeed);
+  }
+  }
+///////////////////////////
+///////////SETUP///////////
+void setup() {
+//  pinMode(nozstepPin,OUTPUT);
+//  pinMode(nozdirPin,OUTPUT);
+  pinMode(stepPin,OUTPUT);
+  pinMode(dirPin,OUTPUT);
+
+  //time for nozzle and height of water initial
+  tnoz = 2;
+  z=z0;
+  nozAngle = 90;
+  baseHeight = 30; // to be changed
+
+  //input distance of soldiers
+  inputX(93,93,58,23);
+  inputAngle(30,60,90,120);
+
+  //iterator
+  i=0;
+
+Serial.begin(9600);
+}
+////////////////////////
+//////////LOOP//////////
+void loop() {
+  while (i!=4){
+  y0 = yb + (1.000 / 4.000) * pow(x[i], 2) * (1.00 / z);
+  
+  //lift the base up to y0
+  //tali3 y0 interms of stepper steps
+  if(y0>baseHeight)
+  dir = HIGH; // to be changed
+  else if(y0<baseHeight)
+  dir = LOW; // to be changed
+
+  //liftBase(steps, 2, dir);
+  delay(1000);
+  
+  //rotate the stepper to angle theta[i]
+//  if((theta[i]-nozAngle)<0)
+//  nozDir = HIGH; // to be changed
+//  else if ((theta[i]-nozAngle)>0)
+//  nozDir = LOW; // to be changed
+//
+//  rotateNoz((theta[i]-nozAngle)/0.9, 1, nozDir);
+//  delay(500);
+
+  //open the valve of tnoz seconds
+  openValve();
+  delay(tnoz);
+  closeValve();
+  
+  //Update the value of the water height
+  z = pow((sqrt(z)-(sqrt(g/2))*(Aj/Ab)*tnoz), 2);
+
+  //Print the values
+//  Serial.print("distance of soldier :" );
+//  Serial.println(x[i]);
+//  Serial.print("Angle of soldier: ");
+//  Serial.println(theta[i]);
+//  Serial.print("Required height of nozzle: ");
+//  Serial.println(y0);
+//  Serial.print("New water level: ");
+//  Serial.println(z);
+//  Serial.println();
+  
+  //increment 
+  baseHeight = y0;
+  nozAngle = theta[i];
+  i++;
+  delay(1000);
+  }
+}
