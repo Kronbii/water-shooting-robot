@@ -102,9 +102,6 @@ Document changes in `docs/wiring.md` if you rewire.
 
 ## 🗑 Migration Checklist (When Ready)
 - [ ] Move `CAD-models/*` → `hardware/cad/`
-- [ ] Remove `src/` after confirming no unique logic is missing
-- [ ] Add BOM (`hardware/` folder)
-- [ ] Add assembly photos / wiring diagram
 
 ## 📄 License
 Add a license (MIT / Apache-2.0 / GPL) to clarify usage. Currently unspecified.
