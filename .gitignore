@@ -1,0 +1,15 @@
+# Arduino build artifacts
+*.arduinoide.*
+*.hex
+*.elf
+/build/
+
+# CAD backups
+ecad/
+*.bak
+
+# OS / editor
+.DS_Store
+*.swp
+.vscode/
+.idea/
